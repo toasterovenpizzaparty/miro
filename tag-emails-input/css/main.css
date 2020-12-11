@@ -1,0 +1,51 @@
+.block {
+}
+
+.tagify.form {
+  /* max-width: 500px; */
+  background: yellow;
+  display: flex;
+  flex-direction: row;
+}
+
+.tagify .block {
+  position: relative;
+}
+
+.tagify .block.block__tag {
+  padding: 5px;
+  margin: 5px;
+  border-radius: 25px;
+}
+.tagify .block.block__tag--email {
+  background-color: red;
+}
+.tagify .block.block__tag--word {
+  background-color: none;
+}
+
+.tagify .block__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  /* background: url('data:image/svg+xml; ... '); */
+}
+
+.tagify .blocks {
+  display: flex;
+  flex: 1 0 100%;
+  flex-wrap: wrap;
+}
+
+.tagify .blocks__input {
+  height: 35px;
+  background: red;
+  border: 0;
+  flex: 1 1 0%;
+  min-width: 100px;
+}
+.tagify .blocks__input:focus {
+  outline: none;
+}

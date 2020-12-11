@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+      "allowSyntheticDefaultImports": true,
+      "declaration": true,
+      "esModuleInterop": true,
+      "importHelpers": true,
+      "jsx": "react",
+      "lib": ["es2017", "dom"],
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "noFallthroughCasesInSwitch": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noImplicitAny": true,
+      "noImplicitReturns": true,
+      "noImplicitThis": true,
+      "outDir": "dist/types",
+      "resolveJsonModule": true,
+      "sourceMap": true,
+      "strict": true,
+      "strictNullChecks": true,
+      "target": "es2015",
+      "types": ["jest"],
+      "baseUrl": "server/app",
+      "paths": {
+          "@miro/tag-emails-input": ["../../tag-emails-input"],
+      }
+    },
+    "exclude": ["node_modules", "dist"]
+  }
