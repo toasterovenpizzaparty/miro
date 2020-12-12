@@ -1,4 +1,62 @@
+html,
+body,
+button,
+input {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+h1 {
+  margin: 8px auto 24px;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 27.24px;
+}
+
 #tagify-me {
-  max-height: 200px;
+  width: 100%;
+  height: 96px;
+  max-height: 96px;
   overflow: auto;
+}
+
+.panel.panel__wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border-radius: 8px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+  background-color: white;
+
+  width: 500px;
+  height: 300px;
+}
+
+.panel.panel__share-input {
+  padding: 24px 50px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-radius: 0px;
+  background-color: #f8f8f7;
+}
+
+.panel.panel__actions {
+  padding: 24px 50px;
+}
+
+.button.button__primary {
+  padding: 8px 16px;
+  background: #4262ff;
+  border-radius: 6px;
+  border: 0;
+  color: white;
+}
+
+.button.button__primary.button__primary--margin-right {
+  margin-right: 16px;
 }

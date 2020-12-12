@@ -2,10 +2,20 @@
 }
 
 .tagify.form {
-  /* max-width: 500px; */
-  background: yellow;
+  background: #ffffff;
+  border: 1px solid #c3c2cf;
+  box-sizing: border-box;
+  border-radius: 4px;
   display: flex;
   flex-direction: row;
+  font-size: 14px;
+  line-height: 24px;
+  padding: 8px;
+}
+
+.tagify input {
+  font-size: 14px;
+  line-height: 24px;
 }
 
 .tagify .block {
@@ -13,24 +23,36 @@
 }
 
 .tagify .block.block__tag {
-  padding: 5px;
-  margin: 5px;
-  border-radius: 25px;
+  padding: 4px 24px 4px 8px;
+  margin: 2px 4px;
+  border-radius: 100px;
+  border-bottom: 1px solid transparent;
+  max-height: 28px;
 }
 .tagify .block.block__tag--email {
-  background-color: red;
+  background: rgba(102, 153, 255, 0.2);
 }
 .tagify .block.block__tag--word {
+  padding: 4px 16px 4px 0;
   background-color: none;
+  border-bottom: 1px dashed #d92929;
+  border-radius: 0;
 }
 
 .tagify .block__close {
   position: absolute;
   top: 0;
+  right: 8px;
+  bottom: 0;
+  margin: auto;
+  width: 8px;
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg width='8' height='8' viewBox='0 0 8 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 0.8L7.2 0L4 3.2L0.8 0L0 0.8L3.2 4L0 7.2L0.8 8L4 4.8L7.2 8L8 7.2L4.8 4L8 0.8Z' fill='%23050038'/%3E%3C/svg%3E%0A");
+  cursor: pointer;
+}
+
+.tagify .block.block__tag--word .block__close {
   right: 0;
-  width: 15px;
-  height: 15px;
-  /* background: url('data:image/svg+xml; ... '); */
 }
 
 .tagify .blocks {
@@ -40,12 +62,28 @@
 }
 
 .tagify .blocks__input {
-  height: 35px;
-  background: red;
+  margin: 2px 0;
+  padding: 4px 24px 4px 8px;
   border: 0;
   flex: 1 1 0%;
   min-width: 100px;
+  max-height: 28px;
 }
+
 .tagify .blocks__input:focus {
   outline: none;
+}
+
+.tagify .blocks__input::-webkit-input-placeholder {
+  /* Edge */
+  color: #c3c2cf;
+}
+
+.tagify .blocks__input:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #c3c2cf;
+}
+
+.tagify .blocks__input::placeholder {
+  color: #c3c2cf;
 }

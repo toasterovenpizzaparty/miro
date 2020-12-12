@@ -3,13 +3,21 @@
     <head>
         <title>Tagify editor.</title>
         <link rel="stylesheet" href="main.css">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     </head>
     <body>
-        Hi world
-
-        <div id="tagify-me"></div>
-        <button id="button-add-email" class="client button button__primary">Add email</button>
-        <button id="button-get-email-count" class="client button button__primary">Get emails count</button>
+        <div class="panel panel__wrapper">
+            <div class="panel panel__share-input">
+                <h1>Share <strong>Board name</strong> with others</h1>
+                <div id="tagify-me"></div>
+            </div>
+            <div class="panel panel__actions">
+                <button id="button-add-email" class="button button__primary button__primary--margin-right">Add email</button>
+                <button id="button-get-email-count" class="button button__primary">Get emails count</button>
+            </div>
+        </div>
+        
         <script type="text/javascript" src="./tag-emails-input/dist/index.js"></script>
         <script type="text/javascript">
             
