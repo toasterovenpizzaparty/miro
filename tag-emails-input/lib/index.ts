@@ -10,7 +10,6 @@ import {
 } from "./elements";
 import { convertTextToWordsAndEmailBlockNodes, BLOCK_TYPE } from "./blocks";
 import { isKeyPressed, getPasteData } from "./utils";
-// import { extractEmails } from "./strings";
 import { STYLE_ID } from "./config";
 import styles from "../css/main.css";
 

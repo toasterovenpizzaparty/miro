@@ -8,6 +8,9 @@
       "statements": 90
     }
   },
+  "moduleNameMapper": {
+    "\\.(css|less|sass|scss)$": "<rootDir>/__mocks__/styleMock.js"
+  },
   "testMatch": ["**/?(*.)+(spec|test).(js|ts)?(x)"],
   "testPathIgnorePatterns": ["<rootDir>/dist/", "<rootDir>/node_modules/"]
 }
