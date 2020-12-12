@@ -11,19 +11,88 @@
 return /******/ (function() { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 551:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ 450:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
-/*
- * Element creation toolset
- */
 
 Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
-exports.createWordBlockNodes = exports.createEmailBlockNodes = exports.insertBefore = exports.appendChildren = exports.createWordBlockNode = exports.createEmailBlockNode = exports.createNode = void 0;
+exports.convertTextToWordsAndEmailBlockNodes = exports.BLOCK_TYPE = void 0;
+
+var elements_1 = __webpack_require__(551);
+
+var strings_1 = __webpack_require__(204);
+
+var BLOCK_TYPE;
+
+(function (BLOCK_TYPE) {
+  BLOCK_TYPE[BLOCK_TYPE["EMAIL"] = 0] = "EMAIL";
+  BLOCK_TYPE[BLOCK_TYPE["WORD"] = 1] = "WORD";
+})(BLOCK_TYPE = exports.BLOCK_TYPE || (exports.BLOCK_TYPE = {}));
+
+var classifyBlockType = function classifyBlockType(word) {
+  var emails = strings_1.extractEmails(word);
+  return {
+    type: emails.length ? BLOCK_TYPE.EMAIL : BLOCK_TYPE.WORD,
+    values: emails.length ? emails : [word]
+  };
+};
+
+var convertTextToWordsAndEmailBlockNodes = function convertTextToWordsAndEmailBlockNodes(text) {
+  var classifiedNodes = strings_1.extractWords(text).map(classifyBlockType);
+  var blockNodes = classifiedNodes.map(function (_ref) {
+    var type = _ref.type,
+        values = _ref.values;
+    return type === BLOCK_TYPE.EMAIL ? values.map(elements_1.createEmailBlockNode) : values.map(elements_1.createWordBlockNode);
+  });
+  return {
+    nodes: blockNodes.length ? blockNodes.reduce(function (a, b) {
+      return a.concat(b);
+    }) : [],
+    emailCount: classifiedNodes.filter(function (_ref2) {
+      var type = _ref2.type;
+      return type === BLOCK_TYPE.EMAIL;
+    }).length
+  };
+};
+
+exports.convertTextToWordsAndEmailBlockNodes = convertTextToWordsAndEmailBlockNodes;
+
+/***/ }),
+
+/***/ 425:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.STYLE_ID = void 0;
+exports.STYLE_ID = "TAGIFY_STYLING";
+
+/***/ }),
+
+/***/ 551:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.getLastChild = exports.hasChildren = exports.appendClassName = exports.setClassName = exports.scrollToEnd = exports.createWordBlockNodes = exports.createEmailBlockNodes = exports.insertBefore = exports.appendChildren = exports.createWordBlockNode = exports.createEmailBlockNode = exports.appendStyles = exports.createInput = exports.createNode = void 0;
+
+var blocks_1 = __webpack_require__(450);
+/*
+ * Element creation toolset
+ */
+
 
 var createNode = function createNode(text, className) {
   var isHTML = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
@@ -35,14 +104,49 @@ var createNode = function createNode(text, className) {
 
 exports.createNode = createNode;
 
+var createInput = function createInput(className, placeholder) {
+  var inputField = document.createElement("input");
+  inputField.className = className;
+  inputField.placeholder = placeholder;
+  return inputField;
+};
+
+exports.createInput = createInput;
+
+var appendStyles = function appendStyles(styles, node) {
+  var id = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var styleNode = document.createElement("style");
+  styleNode.innerHTML = styles;
+
+  if (id) {
+    styleNode.id = id;
+  }
+
+  node.appendChild(styleNode);
+};
+
+exports.appendStyles = appendStyles;
+
+var createCloseButtonNode = function createCloseButtonNode() {
+  return exports.createNode("", "block__close");
+};
+
 var createEmailBlockNode = function createEmailBlockNode(email) {
-  return exports.createNode(email, "block block__tag block__tag--email");
+  var emailNode = exports.createNode(email, "block block__tag block__tag--email");
+  emailNode.dataset.type = blocks_1.BLOCK_TYPE.EMAIL.toString();
+  var closeButtonNode = createCloseButtonNode();
+  exports.appendChildren(emailNode, [closeButtonNode]);
+  return emailNode;
 };
 
 exports.createEmailBlockNode = createEmailBlockNode;
 
 var createWordBlockNode = function createWordBlockNode(word) {
-  return exports.createNode(word, "block block__tag block__tag--word");
+  var wordNode = exports.createNode(word, "block block__tag block__tag--word");
+  wordNode.dataset.type = blocks_1.BLOCK_TYPE.WORD.toString();
+  var closeButtonNode = createCloseButtonNode();
+  exports.appendChildren(wordNode, [closeButtonNode]);
+  return wordNode;
 };
 
 exports.createWordBlockNode = createWordBlockNode;
@@ -75,6 +179,49 @@ var createWordBlockNodes = function createWordBlockNodes(words) {
 
 exports.createWordBlockNodes = createWordBlockNodes;
 
+var scrollToEnd = function scrollToEnd(targetElement) {
+  return targetElement.scrollTop = targetElement.scrollHeight;
+};
+
+exports.scrollToEnd = scrollToEnd;
+
+var setClassName = function setClassName(element, className) {
+  element.className = className;
+  return element;
+};
+
+exports.setClassName = setClassName;
+
+var appendClassName = function appendClassName(element, className) {
+  element.className = element.className + className;
+  return element;
+};
+
+exports.appendClassName = appendClassName;
+
+var hasChildren = function hasChildren(element) {
+  return element.children.length > 0;
+};
+
+exports.hasChildren = hasChildren;
+
+var getLastChild = function getLastChild(element) {
+  var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+  if (element.children.length) {
+    var lastIndex = element.children.length - offset;
+    var child = element.children[lastIndex];
+
+    if (child) {
+      return child;
+    }
+  }
+
+  return null;
+};
+
+exports.getLastChild = getLastChild;
+
 /***/ }),
 
 /***/ 989:
@@ -91,138 +238,148 @@ var tslib_1 = __webpack_require__(655);
 
 var elements_1 = __webpack_require__(551);
 
-var strings_1 = __webpack_require__(204);
+var blocks_1 = __webpack_require__(450);
+
+var utils_1 = __webpack_require__(630); // import { extractEmails } from "./strings";
+
+
+var config_1 = __webpack_require__(425);
 
 var main_css_1 = tslib_1.__importDefault(__webpack_require__(112));
-
-var BLOCK_TYPE;
-
-(function (BLOCK_TYPE) {
-  BLOCK_TYPE[BLOCK_TYPE["EMAIL"] = 0] = "EMAIL";
-  BLOCK_TYPE[BLOCK_TYPE["WORD"] = 1] = "WORD";
-})(BLOCK_TYPE || (BLOCK_TYPE = {}));
-
-var STYLE_ID = "TAGIFY_STYLE";
-
-var classifyBlockType = function classifyBlockType(word) {
-  console.log("word", word);
-  var emails = strings_1.extractEmails(word);
-  console.log("emails", emails);
-  return {
-    type: emails.length ? BLOCK_TYPE.EMAIL : BLOCK_TYPE.WORD,
-    values: emails.length ? emails : [word]
-  };
-};
-
-var scrollToEnd = function scrollToEnd(targetElement) {
-  return targetElement.scrollTop = targetElement.scrollHeight;
-};
-
-var enhanceBlockWithCloseButton = function enhanceBlockWithCloseButton(parentNode, onClick) {
-  var closeNode = elements_1.createNode("", "block__close");
-  parentNode.appendChild(closeNode);
-  closeNode.addEventListener("mousedown", onClick);
-};
-/* Since IE11 is to be supported, i will not use arrow functions as these are part */
+/*
+ * Main entry point
+ */
 
 
 var Tagify = function Tagify(DOMElement) {
-  DOMElement.className = DOMElement.className + "tagify form";
+  // -- Setup our basic elements, input, containers.
+  elements_1.appendClassName(DOMElement, "tagify form"); // Create a container to keep the inputfield and blocks in.
+
   var blocks = elements_1.createNode("", "blocks");
-  DOMElement.appendChild(blocks);
-  var inputField = document.createElement("input");
-  inputField.className = "blocks__input";
-  inputField.placeholder = "add more people";
+  var inputField = elements_1.createInput("blocks__input", "add more people");
   blocks.appendChild(inputField);
-  var headNode = document.querySelector("head");
-  var isStyleApplied = !!document.querySelector("#" + STYLE_ID);
+  DOMElement.appendChild(blocks); // Inject css styling into the <HEAD>
+
+  var headNode = document.querySelector("head"); // Make sure no style is applied yet.
+
+  var isStyleApplied = !!document.querySelector("#" + config_1.STYLE_ID);
 
   if (headNode && !isStyleApplied) {
-    var styleNode = document.createElement("style");
-    styleNode.innerHTML = main_css_1["default"].toString();
-    styleNode.id = STYLE_ID;
-    headNode.appendChild(styleNode);
-  }
+    // Add our styling to the <HEAD>
+    elements_1.appendStyles(main_css_1["default"].toString(), headNode, config_1.STYLE_ID);
+  } // -- Finished setting up basic elements.
+  // -- Main capture functions for emails or words
+  // Keep track of the number of emails created.
+
+
+  var totalEmailCount = 0; // Simple count function to expose the current count
+
+  var countEmails = function countEmails() {
+    return totalEmailCount;
+  }; // A little bit convoluted;
+  // On press delete find the parent node and remove it from the blocks div.
+  // If there is a datatype set with the BLOCK_TYPE.EMAIL, we subtract 1 from our list
+
 
   var onPressDelete = function onPressDelete(event) {
     if (event.target) {
-      blocks.removeChild(event.target.parentNode);
-    }
-  };
+      // Make sure typescript understands what type we are expecting.
+      var parent = event.target.parentNode;
 
-  var captureWordsAndEmails = function captureWordsAndEmails(text, node, insertBeforeNode, scrollAreaElement) {
-    var words = strings_1.extractWords(text);
-
-    for (var i = 0; i < words.length; i++) {
-      var word = words[i];
-
-      var _classifyBlockType = classifyBlockType(word),
-          type = _classifyBlockType.type,
-          values = _classifyBlockType.values;
-
-      var blockNodes = [];
-
-      for (var j = 0; j < values.length; j++) {
-        var blockNode = type === BLOCK_TYPE.EMAIL ? elements_1.createEmailBlockNode(values[j]) : elements_1.createWordBlockNode(values[j]);
-        enhanceBlockWithCloseButton(blockNode, onPressDelete);
-        blockNodes.push(blockNode);
+      if (parent.dataset.type === blocks_1.BLOCK_TYPE.EMAIL.toString()) {
+        totalEmailCount--;
       }
 
-      elements_1.insertBefore(node, blockNodes, insertBeforeNode);
+      blocks.removeChild(event.target.parentNode);
     }
+  }; // Here is our main function to convert text into blocks.
+  // The text is converted into nodes and returned along with the number of email blocks created.
+  // The onPressDelete function is hoisted to ensure we can easily remove it.
+  // We append our blocks before the inputfield
+  // Finally we scroll to the bottom.
 
-    scrollToEnd(scrollAreaElement);
-  };
 
-  var onKeyPressed = function onKeyPressed(event) {
-    // https://caniuse.com/?search=keyboardevent. event.key has best coverage for our supported browsers.
-    var key = event.key.toLowerCase();
-    var isInputEmpty = inputField.value.trim() === "";
-    var hasBlocks = blocks.children.length > 1;
-    var isEmailsReadyForCapture = [",", "enter"].indexOf(key) > -1;
-    var isBlockReadyForDelete = ["del", "backspace"].indexOf(key) > -1 && isInputEmpty && hasBlocks;
+  var convertTextToBlocks = function convertTextToBlocks(text) {
+    // Convert our text into block nodes.
+    var _blocks_1$convertText = blocks_1.convertTextToWordsAndEmailBlockNodes(text),
+        nodes = _blocks_1$convertText.nodes,
+        emailCount = _blocks_1$convertText.emailCount; // Tally up our email count.
 
-    if (isEmailsReadyForCapture) {
-      captureWordsAndEmails(inputField.value, blocks, inputField, DOMElement);
+
+    totalEmailCount += emailCount; // Add eventlisteners to our close buttons.
+
+    nodes.forEach(function (node) {
+      return elements_1.hasChildren(node) && node.children[0].addEventListener("mousedown", onPressDelete);
+    }); // Insert our nodes within blocks, but before the inputfield.
+
+    elements_1.insertBefore(blocks, nodes, inputField); // Scroll to the end of the content.
+
+    elements_1.scrollToEnd(DOMElement);
+  }; // -- End of main capture
+  // -- Initialize our listeners
+  // Upon pressing certain keys within the inputfield we either delete blocks or add new blocks.
+  // Comma and enter add blocks.
+  // We do this on key up to ensure text is filled in.
+
+
+  var onKeyUpPressed = function onKeyUpPressed(event) {
+    if (utils_1.isKeyPressed(event, [",", "enter"])) {
+      convertTextToBlocks(inputField.value);
       inputField.value = "";
-    } else if (isBlockReadyForDelete) {
-      var lastIndex = blocks.children.length - 2; // last index is our input
-
-      var node = blocks.children[lastIndex];
-      blocks.removeChild(node);
     }
 
-    scrollToEnd(DOMElement);
-  };
+    elements_1.scrollToEnd(DOMElement);
+  }; // Delete or backspace removes blocks.
+
+
+  var onKeyDownPressed = function onKeyDownPressed(event) {
+    if (utils_1.isKeyPressed(event, ["del", "backspace"]) && elements_1.hasChildren(blocks) && // Ensure we have blocks
+    inputField.value.length === 0 // Don't delete if we are just modifying input.
+    ) {
+        var child = elements_1.getLastChild(blocks, 2); // offset is 2, inputfield is the last child.
+
+        if (child) {
+          blocks.removeChild(child);
+        }
+      }
+
+    elements_1.scrollToEnd(DOMElement);
+  }; // Handle paste event, supressing the data from being pasted
+  // immediatly converting it into blocks.
+
 
   var onPaste = function onPaste(event) {
     event.preventDefault(); // Do not let the paste data into the inputfield.
 
-    var pastedText = (event.clipboardData || window.clipboardData).getData("text");
-    captureWordsAndEmails(pastedText, blocks, inputField, DOMElement);
-    scrollToEnd(DOMElement);
-  };
+    var pastedText = utils_1.getPasteData(event, window);
+    convertTextToBlocks(pastedText);
+    elements_1.scrollToEnd(DOMElement);
+  }; // If the inputfield loses focus convert the input to blocks.
+
 
   var onInputFieldBlur = function onInputFieldBlur() {
-    captureWordsAndEmails(inputField.value, blocks, inputField, DOMElement);
-    scrollToEnd(DOMElement);
+    convertTextToBlocks(inputField.value);
+    elements_1.scrollToEnd(DOMElement);
     inputField.value = "";
   };
 
   inputField.addEventListener("blur", onInputFieldBlur);
-  inputField.addEventListener("keyup", onKeyPressed);
-  inputField.addEventListener("paste", onPaste);
+  inputField.addEventListener("keyup", onKeyUpPressed);
+  inputField.addEventListener("keydown", onKeyDownPressed);
+  inputField.addEventListener("paste", onPaste); // -- Finished setting up listeners
+
   return {
-    addEmail: function addEmail(email) {
-      return captureWordsAndEmails(email, blocks, inputField, DOMElement);
+    addEmail: function addEmail(text) {
+      return convertTextToBlocks(text);
     },
-    getEmailCount: function getEmailCount() {
-      var emails = strings_1.extractEmails(DOMElement.textContent || "");
-      return emails.length;
+    countEmail: function countEmail() {
+      return countEmails();
     },
+    // Housekeeping
     destroy: function destroy() {
       inputField.removeEventListener("blur", onInputFieldBlur);
-      inputField.removeEventListener("keyup", onKeyPressed);
+      inputField.removeEventListener("keyup", onKeyUpPressed);
+      inputField.removeEventListener("keydown", onKeyDownPressed);
       inputField.removeEventListener("paste", onPaste);
     }
   };
@@ -259,6 +416,31 @@ var extractEmails = function extractEmails(text) {
 };
 
 exports.extractEmails = extractEmails;
+
+/***/ }),
+
+/***/ 630:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports.getPasteData = exports.isKeyPressed = void 0; // https://caniuse.com/?search=keyboardevent. event.key has best coverage for our supported browsers.
+
+var isKeyPressed = function isKeyPressed(event, keys) {
+  return keys.indexOf(event.key.toLowerCase()) > -1;
+};
+
+exports.isKeyPressed = isKeyPressed;
+
+var getPasteData = function getPasteData(event, window) {
+  return (event.clipboardData || window.clipboardData).getData("text");
+};
+
+exports.getPasteData = getPasteData;
 
 /***/ }),
 

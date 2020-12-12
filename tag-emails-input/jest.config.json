@@ -1,0 +1,13 @@
+{
+  "bail": true,
+  "coverageThreshold": {
+    "global": {
+      "branches": 75,
+      "functions": 85,
+      "lines": 90,
+      "statements": 90
+    }
+  },
+  "testMatch": ["**/?(*.)+(spec|test).(js|ts)?(x)"],
+  "testPathIgnorePatterns": ["<rootDir>/dist/", "<rootDir>/node_modules/"]
+}

@@ -1,10 +1,17 @@
 import {
-  createEmailBlockNode,
-  createWordBlockNode,
   insertBefore,
   createNode,
+  createInput,
+  appendStyles,
+  appendClassName,
+  scrollToEnd,
+  getLastChild,
+  hasChildren,
 } from "./elements";
-import { extractEmails, extractWords } from "./strings";
+import { convertTextToWordsAndEmailBlockNodes, BLOCK_TYPE } from "./blocks";
+import { isKeyPressed, getPasteData } from "./utils";
+// import { extractEmails } from "./strings";
+import { STYLE_ID } from "./config";
 import styles from "../css/main.css";
 
 declare global {
@@ -13,142 +20,133 @@ declare global {
   }
 }
 
-enum BLOCK_TYPE {
-  EMAIL,
-  WORD,
-}
-
-interface BlockInterface {
-  type: BLOCK_TYPE;
-  values: Array<string>;
-}
-
-const STYLE_ID = "TAGIFY_STYLE";
-
-const classifyBlockType = (word: string): BlockInterface => {
-  console.log("word", word);
-  const emails = extractEmails(word);
-  console.log("emails", emails);
-  return {
-    type: emails.length ? BLOCK_TYPE.EMAIL : BLOCK_TYPE.WORD,
-    values: emails.length ? emails : [word],
-  };
-};
-
-const scrollToEnd = (targetElement: Element) =>
-  (targetElement.scrollTop = targetElement.scrollHeight);
-
-const enhanceBlockWithCloseButton = (
-  parentNode: Element,
-  onClick: (event: MouseEvent) => void
-) => {
-  const closeNode = createNode("", "block__close");
-  parentNode.appendChild(closeNode);
-  closeNode.addEventListener("mousedown", onClick);
-};
-
-/* Since IE11 is to be supported, i will not use arrow functions as these are part */
+/*
+ * Main entry point
+ */
 const Tagify = (DOMElement: HTMLDivElement) => {
-  DOMElement.className = DOMElement.className + "tagify form";
+  // -- Setup our basic elements, input, containers.
+  appendClassName(DOMElement, "tagify form");
 
+  // Create a container to keep the inputfield and blocks in.
   const blocks = createNode("", "blocks");
+  const inputField = createInput("blocks__input", "add more people");
+
+  blocks.appendChild(inputField);
   DOMElement.appendChild(blocks);
 
-  const inputField = document.createElement("input");
-  inputField.className = "blocks__input";
-  inputField.placeholder = "add more people";
-  blocks.appendChild(inputField);
-
+  // Inject css styling into the <HEAD>
   const headNode = document.querySelector("head");
+  // Make sure no style is applied yet.
   const isStyleApplied = !!document.querySelector("#" + STYLE_ID);
   if (headNode && !isStyleApplied) {
-    const styleNode = document.createElement("style");
-    styleNode.innerHTML = styles.toString();
-    styleNode.id = STYLE_ID;
-    headNode.appendChild(styleNode);
+    // Add our styling to the <HEAD>
+    appendStyles(styles.toString(), headNode, STYLE_ID);
   }
+  // -- Finished setting up basic elements.
 
+  // -- Main capture functions for emails or words
+  // Keep track of the number of emails created.
+  let totalEmailCount = 0;
+  // Simple count function to expose the current count
+  const countEmails = (): number => totalEmailCount;
+
+  // A little bit convoluted;
+  // On press delete find the parent node and remove it from the blocks div.
+  // If there is a datatype set with the BLOCK_TYPE.EMAIL, we subtract 1 from our list
   const onPressDelete = (event: MouseEvent) => {
     if (event.target) {
+      // Make sure typescript understands what type we are expecting.
+      const parent = <HTMLDivElement>(<HTMLElement>event.target).parentNode;
+      if (parent.dataset.type === BLOCK_TYPE.EMAIL.toString()) {
+        totalEmailCount--;
+      }
       blocks.removeChild(<HTMLElement>(<HTMLElement>event.target).parentNode);
     }
   };
 
-  const captureWordsAndEmails = (
-    text: string,
-    node: Element,
-    insertBeforeNode: Element,
-    scrollAreaElement: Element
-  ) => {
-    const words = extractWords(text);
-
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      const { type, values } = classifyBlockType(word);
-      let blockNodes = [];
-      for (let j = 0; j < values.length; j++) {
-        const blockNode =
-          type === BLOCK_TYPE.EMAIL
-            ? createEmailBlockNode(values[j])
-            : createWordBlockNode(values[j]);
-        enhanceBlockWithCloseButton(blockNode, onPressDelete);
-        blockNodes.push(blockNode);
-      }
-      insertBefore(node, blockNodes, insertBeforeNode);
-    }
-
-    scrollToEnd(scrollAreaElement);
+  // Here is our main function to convert text into blocks.
+  // The text is converted into nodes and returned along with the number of email blocks created.
+  // The onPressDelete function is hoisted to ensure we can easily remove it.
+  // We append our blocks before the inputfield
+  // Finally we scroll to the bottom.
+  const convertTextToBlocks = (text: string) => {
+    // Convert our text into block nodes.
+    const { nodes, emailCount } = convertTextToWordsAndEmailBlockNodes(text);
+    // Tally up our email count.
+    totalEmailCount += emailCount;
+    // Add eventlisteners to our close buttons.
+    nodes.forEach(
+      (node) =>
+        hasChildren(node) &&
+        (<HTMLElement>node.children[0]).addEventListener(
+          "mousedown",
+          onPressDelete
+        )
+    );
+    // Insert our nodes within blocks, but before the inputfield.
+    insertBefore(blocks, nodes, inputField);
+    // Scroll to the end of the content.
+    scrollToEnd(DOMElement);
   };
+  // -- End of main capture
 
-  const onKeyPressed = (event: KeyboardEvent) => {
-    // https://caniuse.com/?search=keyboardevent. event.key has best coverage for our supported browsers.
-    const key = event.key.toLowerCase();
-    const isInputEmpty = inputField.value.trim() === "";
-    const hasBlocks = blocks.children.length > 1;
-    const isEmailsReadyForCapture = [",", "enter"].indexOf(key) > -1;
-    const isBlockReadyForDelete =
-      ["del", "backspace"].indexOf(key) > -1 && isInputEmpty && hasBlocks;
-    if (isEmailsReadyForCapture) {
-      captureWordsAndEmails(inputField.value, blocks, inputField, DOMElement);
+  // -- Initialize our listeners
+  // Upon pressing certain keys within the inputfield we either delete blocks or add new blocks.
+  // Comma and enter add blocks.
+  // We do this on key up to ensure text is filled in.
+  const onKeyUpPressed = (event: KeyboardEvent) => {
+    if (isKeyPressed(event, [",", "enter"])) {
+      convertTextToBlocks(inputField.value);
       inputField.value = "";
-    } else if (isBlockReadyForDelete) {
-      const lastIndex = blocks.children.length - 2; // last index is our input
-      const node = blocks.children[lastIndex];
-      blocks.removeChild(node);
     }
     scrollToEnd(DOMElement);
   };
 
+  // Delete or backspace removes blocks.
+  const onKeyDownPressed = (event: KeyboardEvent) => {
+    if (
+      isKeyPressed(event, ["del", "backspace"]) &&
+      hasChildren(blocks) && // Ensure we have blocks
+      inputField.value.length === 0 // Don't delete if we are just modifying input.
+    ) {
+      const child = getLastChild(blocks, 2); // offset is 2, inputfield is the last child.
+      if (child) {
+        blocks.removeChild(child);
+      }
+    }
+    scrollToEnd(DOMElement);
+  };
+
+  // Handle paste event, supressing the data from being pasted
+  // immediatly converting it into blocks.
   const onPaste = (event: ClipboardEvent) => {
     event.preventDefault(); // Do not let the paste data into the inputfield.
-    const pastedText: string = (
-      event.clipboardData || window.clipboardData
-    ).getData("text");
-    captureWordsAndEmails(pastedText, blocks, inputField, DOMElement);
+    const pastedText = getPasteData(event, window);
+    convertTextToBlocks(pastedText);
     scrollToEnd(DOMElement);
   };
 
+  // If the inputfield loses focus convert the input to blocks.
   const onInputFieldBlur = () => {
-    captureWordsAndEmails(inputField.value, blocks, inputField, DOMElement);
+    convertTextToBlocks(inputField.value);
     scrollToEnd(DOMElement);
     inputField.value = "";
   };
 
   inputField.addEventListener("blur", onInputFieldBlur);
-  inputField.addEventListener("keyup", onKeyPressed);
+  inputField.addEventListener("keyup", onKeyUpPressed);
+  inputField.addEventListener("keydown", onKeyDownPressed);
   inputField.addEventListener("paste", onPaste);
+  // -- Finished setting up listeners
 
   return {
-    addEmail: (email: string) =>
-      captureWordsAndEmails(email, blocks, inputField, DOMElement),
-
-    getEmailCount: () => {
-      const emails = extractEmails(DOMElement.textContent || "");
-      return emails.length;
-    }, // TODO get real emails length.
+    addEmail: (text: string) => convertTextToBlocks(text),
+    countEmail: () => countEmails(),
+    // Housekeeping
     destroy: () => {
       inputField.removeEventListener("blur", onInputFieldBlur);
-      inputField.removeEventListener("keyup", onKeyPressed);
+      inputField.removeEventListener("keyup", onKeyUpPressed);
+      inputField.removeEventListener("keydown", onKeyDownPressed);
       inputField.removeEventListener("paste", onPaste);
     },
   };

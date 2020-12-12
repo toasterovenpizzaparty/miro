@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Tagify editor.</title>
+        <link rel="stylesheet" href="main.css">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="panel panel__wrapper">
+            <div class="panel panel__share-input">
+                <h1>Share <strong>Board name</strong> with others</h1>
+                <div id="tagify-me"></div>
+            </div>
+            <div class="panel panel__actions">
+                <button id="button-add-email" class="button button__primary button__primary--margin-right">Add email</button>
+                <button id="button-get-email-count" class="button button__primary">Get emails count</button>
+            </div>
+        </div>
+        
+        <div id="tagify-me-too"></div>
+        
+        <script type="text/javascript" src="./tag-emails-input/dist/index.js"></script>
+        <script type="text/javascript">
+            
+            function Bootstrap() {
+                // console.log("Hi world.");
+
+                const targetElement = document.querySelector("#tagify-me");
+                if (targetElement) {
+                    // console.log('Got target', targetElement)
+                    const tagifiedInstance = Tagify(targetElement);
+                    
+                    const buttonAddEmails = document.querySelector("#button-add-email")
+                    const buttonGetEmailCount = document.querySelector("#button-get-email-count")
+
+                    const randomEmails = [
+                        "patrick@miro.com",
+                        "john@miro.com",
+                        "jack@miro.com",
+                        "max@miro.com",
+                        "giselle@miro.com",
+                        "jackie@miro.com",
+                        "ivan@miro.com",
+                    ];
+    
+                    buttonAddEmails.addEventListener("mousedown", function() { tagifiedInstance.addEmail(randomEmails[Math.floor(Math.random() * (randomEmails.length - 1))]) }) 
+                    buttonGetEmailCount.addEventListener("mousedown", function() { window.alert( "Email count is: " + tagifiedInstance.countEmail()) }); 
+                }
+
+
+
+            };
+
+            function onDocumentReady(fn) {
+                if (document.readyState != "loading") {
+                    fn();
+                } else {
+                    document.addEventListener("DOMContentLoaded", fn);
+                }
+            };
+
+            onDocumentReady(Bootstrap);
+        </script>
+    </body>
+</html>

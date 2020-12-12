@@ -18,15 +18,17 @@
             </div>
         </div>
         
+        <div id="tagify-me-too"></div>
+        
         <script type="text/javascript" src="./tag-emails-input/dist/index.js"></script>
         <script type="text/javascript">
             
             function Bootstrap() {
-                console.log("Hi world.");
+                // console.log("Hi world.");
 
                 const targetElement = document.querySelector("#tagify-me");
                 if (targetElement) {
-                    console.log('Got target', targetElement)
+                    // console.log('Got target', targetElement)
                     const tagifiedInstance = Tagify(targetElement);
                     
                     const buttonAddEmails = document.querySelector("#button-add-email")
@@ -43,8 +45,13 @@
                     ];
     
                     buttonAddEmails.addEventListener("mousedown", function() { tagifiedInstance.addEmail(randomEmails[Math.floor(Math.random() * (randomEmails.length - 1))]) }) 
-                    buttonGetEmailCount.addEventListener("mousedown", function() { window.alert( "Email count is: " + tagifiedInstance.getEmailCount()) }); 
+                    buttonGetEmailCount.addEventListener("mousedown", function() { window.alert( "Email count is: " + tagifiedInstance.countEmail()) }); 
                 }
+                const targetElementTwo = document.querySelector("#tagify-me-too");
+                if(targetElementTwo) {
+                    const tagifiedSecondInstance = Tagify(targetElementTwo);
+                }
+
 
 
             };
