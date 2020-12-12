@@ -1,5 +1,6 @@
 # Tagify
 Tagify is used to easily transform any element into an input to capture email blocks.
+See it in action [here](https://toasterovenpizzaparty.github.io/miro/)
 
 ## Installation
 The folders contains the following structure:
