@@ -19,6 +19,7 @@
         </div>
         
         <div id="tagify-me-too"></div>
+        <div id="tagify-me-three"></div>
         
         <script type="text/javascript" src="./tag-emails-input/dist/index.js"></script>
         <script type="text/javascript">
@@ -48,7 +49,15 @@
                     buttonGetEmailCount.addEventListener("mousedown", function() { window.alert( "Email count is: " + tagifiedInstance.countEmail()) }); 
                 }
 
-
+                const secondTargetElement = document.querySelector("#tagify-me-too");
+                if(secondTargetElement) {
+                    const secondTagifiedInstance = Tagify(secondTargetElement);
+                }
+                
+                const thirdTargetElement = document.querySelector("#tagify-me-three");
+                if(thirdTargetElement) {
+                    const thirdTagifiedInstance = Tagify(thirdTargetElement);
+                }
 
             };
 
