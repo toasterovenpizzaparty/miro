@@ -1,6 +1,3 @@
-.block {
-}
-
 .tagify.form {
   background: #ffffff;
   border: 1px solid #c3c2cf;
@@ -38,7 +35,6 @@
   border-bottom: 1px dashed #d92929;
   border-radius: 0;
 }
-
 .tagify .block__close {
   position: absolute;
   top: 0;

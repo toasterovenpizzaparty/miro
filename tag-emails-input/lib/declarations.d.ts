@@ -1,5 +1,5 @@
 /*
- * Setup interfaces and typescript definitions here
+ * Setup any declarations we might need to keep Typescript going.
  */
-// This makes typescript aware of the clipboardData attribute on window.
+
 declare module "*.css";
